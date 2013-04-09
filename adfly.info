@@ -1,0 +1,7 @@
+name = Adfly Script
+description = Adfly Script is a Drupal module that allows each individual page to be used with Adfly.
+core = 7.x
+dependencies[] = token
+dependencies[] = token_filter
+project = "adfly"
+files[] = adfly.module

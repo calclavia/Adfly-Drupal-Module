@@ -1,0 +1,46 @@
+<?php
+
+function adfly_token_info()
+{
+	$info['tokens']['adfly'] = array(
+		'name' => t('Adfly'),
+		'description' => t('This will turn links on the page to Adfly links.'),
+	);
+	return $info;
+}
+
+/**
+ * Implements hook_tokens(). This hook will operate the token and replace it with its value.
+ */
+function adfly_tokens($type, $tokens, array $data = array(), array $options = array())
+{
+	$replacements = array();
+	$sanitize = !empty($options['sanitize']);
+
+	if ($type == 'adfly')
+	{
+		foreach ($tokens as $adflyID => $original)
+		{
+			if ($adflyID)
+			{
+				$replacements[$original] = getAdflyScript($adflyID);
+				break;
+			}
+		}
+	}
+
+	return $replacements;
+}
+
+function getAdflyScript($id)
+{
+
+	return "
+	<script type='text/javascript'> 
+	var adfly_id = $id;
+	var adfly_advert = 'int';
+	var domains = ['.zip', '.jar'];
+	</script>
+	<script src='http://cdn.adf.ly/js/link-converter.js'></script> ";
+}
+?>
