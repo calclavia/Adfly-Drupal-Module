@@ -6,6 +6,10 @@ function adfly_token_info()
 		'name' => t('Adfly'),
 		'description' => t('This will turn links on the page to Adfly links.'),
 	);
+	$info['tokens']['adfocus'] = array(
+		'name' => t('Adfly'),
+		'description' => t('This will turn links on the page to Adfly links.'),
+	);
 	return $info;
 }
 
@@ -28,6 +32,17 @@ function adfly_tokens($type, $tokens, array $data = array(), array $options = ar
 			}
 		}
 	}
+	if ($type == 'adfocus')
+	{
+		foreach ($tokens as $adfocusID => $original)
+		{
+			if ($adfocusID)
+			{
+				$replacements[$original] = getAdfocusScript($adfocusID);
+				break;
+			}
+		}
+	}
 
 	return $replacements;
 }
@@ -42,5 +57,17 @@ function getAdflyScript($id)
 	var domains = ['.zip', '.jar'];
 	</script>
 	<script src='http://cdn.adf.ly/js/link-converter.js'></script> ";
+}
+
+function getAdfocusScript($id)
+{
+
+	return "
+	<script type='text/javascript'> 
+	var id_user = $id;
+	var domains_include = ['.zip', '.jar'];
+	</script>
+	<script src='http://adfoc.us/js/fullpage/script.js'></script>
+	";
 }
 ?>
