@@ -20,6 +20,37 @@ function getAdflyScript($id)
 	<script src='http://cdn.adf.ly/js/link-converter.js'></script> ";
 }
 
+/**
+ * Adfly Url Shortener PHP API. Will be used when API key is provided
+ * 
+ * @param string $url http://www.google.com
+ * @param string $key 7abccd03cc3005835cc61dd956b583ca
+ * @param int $uid 1234
+ * 
+ * @param string $advert_type (optional) int || banner
+ * @param string $domain (optional) adf.ly || q.gs
+ */
+function adfly($url, $key, $uid, $domain = 'adf.ly', $advert_type = 'int')
+{
+  // base api url
+  $api = 'http://api.adf.ly/api.php?';
+
+  // api queries
+  $query = array(
+    'key' => $key,
+    'uid' => $uid,
+    'advert_type' => $advert_type,
+    'domain' => $domain,
+    'url' => $url
+  );
+
+  // full api url with query string
+  $api = $api . http_build_query($query);
+  // get data
+  if ($data = file_get_contents($api))
+    return $data;
+}
+
 function getAdfocusScript($id)
 {
 
@@ -35,18 +66,35 @@ function getAdfocusScript($id)
 /**
  * WordPress Shortcode
  */
-function adfly_filter($atts)
+function adfly_filter($atts, $content = null)
 {
-    return getAdflyScript($atts['id']);
+    if(!empty($atts['id']))
+    {
+        if(!empty($atts['apiKey']) && $content != null)
+        {
+            //adfly('http://w3bees.com', $apiKey, $uId);
+            
+            return null;
+        }
+        
+        return getAdflyScript($atts['id']);
+    }
+    
+    return "<p>Please specify an account ID number.";
 }
 
-add_shortcode( 'adfly', 'adfly_filter' );
+add_shortcode('adfly', 'adfly_filter');
 
 function adfocus_filter($atts)
 {
-    return getAdfocusScript($atts['id']);
+    if(!empty($atts['id']))
+    {
+        return getAdfocusScript($atts['id']);
+    }
+    
+    return "<p>Please specify an account ID number.";
 }
 
-add_shortcode( 'adfocus', 'adfocus_filter' );
+add_shortcode('adfocus', 'adfocus_filter');
 
 ?>
