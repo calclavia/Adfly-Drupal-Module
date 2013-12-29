@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Adfly Injector
  * Plugin URI: http://calclavia.com
- * Description: A plugin that injects Adfly scripts for specific links. Use [adfly id="adflyID"]
+ * Description: A plugin that injects Adfly scripts for specific links. Use [adfly id="adflyID" apikey="apikey"]
  * Version: 1.0.0
  * Author: Calclavia
  * Author URI: http://calclavia.com
@@ -32,23 +32,23 @@ function getAdflyScript($id)
  */
 function adfly($url, $key, $uid, $domain = 'adf.ly', $advert_type = 'int')
 {
-  // base api url
-  $api = 'http://api.adf.ly/api.php?';
-
-  // api queries
-  $query = array(
+    // Base api url
+    $api = 'http://api.adf.ly/api.php?';
+    
+    // Api queries
+    $query = array(
     'key' => $key,
     'uid' => $uid,
     'advert_type' => $advert_type,
-    'domain' => $domain,
-    'url' => $url
-  );
+    'domain' => $domain
+    );
 
-  // full api url with query string
-  $api = $api . http_build_query($query);
-  // get data
-  if ($data = file_get_contents($api))
-    return $data;
+    // Full api url with query string
+    $api = $api . http_build_query($query) . "&url=" . $url;
+
+    // get data
+    if ($data = file_get_contents($api))
+        return $data;
 }
 
 function getAdfocusScript($id)
@@ -70,7 +70,7 @@ function adfly_filter($atts, $content = null)
 {
     if(!empty($atts['id']))
     {
-        if(!empty($atts['apiKey']) && $content != null)
+        if(!empty($atts['apikey']) && !is_null($content))
         {
             $input = do_shortcode($content);
             $regexp = "<a\s[^>]*href=(\"??)([^\" >]*?)\\1[^>]*>(.*)<\/a>";
@@ -79,13 +79,12 @@ function adfly_filter($atts, $content = null)
             {
                 foreach($matches as $match)
                 {
-                    // $match[2] = link address
-                    // $match[3] = link text
-                    str_replace($match[2],  adfly($match[2], $atts['apiKey'], $atts['id']),  $content);
+                    $url = str_replace("'", "", $match[2]);;
+                    $input = str_replace($url,  adfly($url, $atts['apikey'], $atts['id']),  $input);
                 }
             }
             
-            return $content;
+            return $input;
         }
         
         return getAdflyScript($atts['id']);
