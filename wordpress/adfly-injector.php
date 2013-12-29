@@ -72,9 +72,20 @@ function adfly_filter($atts, $content = null)
     {
         if(!empty($atts['apiKey']) && $content != null)
         {
-            //adfly('http://w3bees.com', $apiKey, $uId);
+            $input = do_shortcode($content);
+            $regexp = "<a\s[^>]*href=(\"??)([^\" >]*?)\\1[^>]*>(.*)<\/a>";
             
-            return null;
+            if(preg_match_all("/$regexp/siU", $input, $matches, PREG_SET_ORDER))
+            {
+                foreach($matches as $match)
+                {
+                    // $match[2] = link address
+                    // $match[3] = link text
+                    str_replace($match[2],  adfly($match[2], $atts['apiKey'], $atts['id']),  $content);
+                }
+            }
+            
+            return $content;
         }
         
         return getAdflyScript($atts['id']);
